@@ -32,65 +32,65 @@ else
 fi
 
 # Create the bridge interface if it doesn't already exist
-if ! ip link show BRIDGE_NAME &> /dev/null; then
+if ! ip link show $BRIDGE_NAME &> /dev/null; then
     echo "Creating the bridge interface..."
-    ip link add name BRIDGE_NAME type bridge
+    ip link add name $BRIDGE_NAME type bridge
 else
-    echo "Bridge interface "BRIDGE_NAME" already exists."
+    echo "Bridge interface $BRIDGE_NAME already exists."
 fi
 
 # Add physical interfaces to the bridge
-echo "Adding " IFACE1 " and " IFACE2 " to the bridge..."
-ip link set IFACE1 master BRIDGE_NAME
-ip link set IFACE2 master BRIDGE_NAME
+echo "Adding $IFACE1 and $IFACE2 to the bridge..."
+ip link set $IFACE1 master $BRIDGE_NAME
+ip link set $IFACE2 master $BRIDGE_NAME
 
 # Bring up the interfaces
 echo "Bringing up the interfaces..."
-ip link set dev BRIDGE_NAME up
-ip link set dev IFACE1 up
-ip link set dev IFACE2 up
+ip link set dev $BRIDGE_NAME up
+ip link set dev $IFACE1 up
+ip link set dev $IFACE2 up
 
 # Set promiscuous mode
 echo "Setting promiscuous mode..."
-ip link set BRIDGE_NAME promisc on
-ip link set IFACE1 promisc on
-ip link set IFACE2 promisc on
+ip link set $BRIDGE_NAME promisc on
+ip link set $IFACE1 promisc on
+ip link set $IFACE2 promisc on
 
 # Flush IP addresses from physical interfaces
-echo "Flushing IP addresses from eth1 and eth2..."
-ip addr flush dev IFACE1
-ip addr flush dev IFACE2
+echo "Flushing IP addresses from $IFACE1 and $IFACE2..."
+ip addr flush dev $IFACE1
+ip addr flush dev $IFACE2
 
 # Disable STP and set forward delay to 0
 echo "Configuring bridge settings..."
-nmcli connection add type bridge ifname BRIDGE_NAME
-nmcli connection add type ethernet slave-type bridge con-name br-&IFACE1 ifname IFACE1 master BRIDGE_NAME
-nmcli connection add type ethernet slave-type bridge con-name br-&IFACE1 ifname IFACE2 master BRIDGE_NAME
-nmcli connection modify BRIDGE_NAME bridge.stp no
-nmcli connection modify BRIDGE_NAME bridge.forward-delay 0
-nmcli connection modify BRIDGE_NAME bridge.multicast-snooping no
+nmcli connection add type bridge ifname $BRIDGE_NAME
+nmcli connection add type ethernet slave-type bridge con-name br-$IFACE1 ifname $IFACE1 master $BRIDGE_NAME
+nmcli connection add type ethernet slave-type bridge con-name br-$IFACE1 ifname $IFACE2 master $BRIDGE_NAME
+nmcli connection modify $BRIDGE_NAME bridge.stp no
+nmcli connection modify $BRIDGE_NAME bridge.forward-delay 0
+nmcli connection modify $BRIDGE_NAME bridge.multicast-snooping no
 
 # Adjust bridge settings to ensure proper handling of multicast and broadcast packets
 echo "Adjusting bridge settings for multicast and broadcast traffic..."
-ip link set BRIDGE_NAME type bridge ageing_time 0
+ip link set $BRIDGE_NAME type bridge ageing_time 0
 
 # Bring up the bridge connection
 echo "Bringing up the bridge connection..."
-nmcli connection up BRIDGE_NAME
+nmcli connection up $BRIDGE_NAME
 
 # Change the mask so that all traffic is forwarded, including LLDP
-ip link set BRIDGE_NAME type bridge group_fwd_mask 0x4018
+ip link set $BRIDGE_NAME type bridge group_fwd_mask 0x4018
 
 # Verify the configuration
 echo "Verifying the configuration..."
 nmcli connection show
 nmcli device status
-ip addr show BRIDGE_NAME
-ip link show BRIDGE_NAME
-ip link show IFACE1
-ip link show IFACE2
+ip addr show $BRIDGE_NAME
+ip link show $BRIDGE_NAME
+ip link show $IFACE1
+ip link show $IFACE2
 
 # Display bridge details
-bridge link show BRIDGE_NAME
+bridge link show $BRIDGE_NAME
 
 echo "Bridge setup complete. Please check your PROFINET devices."
