@@ -31,6 +31,23 @@ else
     echo "NetworkManager is already installed."
 fi
 
+# Function to delete connections by name
+delete_connections_by_name() {
+    local conn_name=$1
+    echo "Checking for existing connections named $conn_name..."
+    local uuids=$(nmcli -t -f UUID,NAME connection show | grep "$conn_name" | cut -d: -f1)
+
+    for uuid in $uuids; do
+        echo "Deleting $conn_name with UUID $uuid..."
+        nmcli connection delete uuid $uuid
+    done
+}
+
+# Delete existing connections
+delete_connections_by_name $BRIDGE_NAME
+delete_connections_by_name "br-$IFACE1"
+delete_connections_by_name "br-$IFACE2"
+
 # Create the bridge interface if it doesn't already exist
 if ! ip link show $BRIDGE_NAME &> /dev/null; then
     echo "Creating the bridge interface..."
@@ -65,7 +82,7 @@ ip addr flush dev $IFACE2
 echo "Configuring bridge settings..."
 nmcli connection add type bridge ifname $BRIDGE_NAME
 nmcli connection add type ethernet slave-type bridge con-name br-$IFACE1 ifname $IFACE1 master $BRIDGE_NAME
-nmcli connection add type ethernet slave-type bridge con-name br-$IFACE1 ifname $IFACE2 master $BRIDGE_NAME
+nmcli connection add type ethernet slave-type bridge con-name br-$IFACE2 ifname $IFACE2 master $BRIDGE_NAME
 nmcli connection modify $BRIDGE_NAME bridge.stp no
 nmcli connection modify $BRIDGE_NAME bridge.forward-delay 0
 nmcli connection modify $BRIDGE_NAME bridge.multicast-snooping no
