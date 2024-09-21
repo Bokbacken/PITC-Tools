@@ -233,7 +233,7 @@ def create_tooltip(widget, text):
 
 # Initialize the main window
 root = tk.Tk()
-root.title("Netem TC Configuration Tool")
+root.title("Network Manipulation Tool")
 
 # Interface Selection
 interface_frame = tk.LabelFrame(root, text="Select Interfaces to Apply Netem")
