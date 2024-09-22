@@ -1,5 +1,14 @@
 #!/bin/bash
 
+### BEGIN INIT INFO
+# Provides:          brstart
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start the bridge at boot
+### END INIT INFO
+
 # Check for root privileges
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
@@ -78,3 +87,6 @@ ip link show eth2
 bridge link show br0
 
 echo "Bridge setup complete. Please check your PROFINET devices."
+
+# Modify this line to add a ip address to the br0 interface
+# ip addr add 172.16.0.220/24 br0
