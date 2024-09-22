@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Manipulator
+Comment=Network utility
+GenericName=Network utility
+Exec=sudo python3 /home/pi/PITC-Tools/manipulate/manipulate.py
+Icon=
+Terminal=false
+StartupNotify=true
+Type=Application
+Categories=Network;Monitor;
+MimeType=text/plain;
